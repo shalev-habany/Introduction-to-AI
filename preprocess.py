@@ -1,35 +1,38 @@
 import pandas as pd
 import numpy as np
 
+column_name_list = ["class", 'cap-shape',
+                    'cap-surface',
+                    'cap-color',
+                    'bruises?',
+                    'odor',
+                    'gill-attachment',
+                    'gill-spacing',
+                    'gill-size',
+                    'gill-color',
+                    'stalk-shape',
+                    'stalk-surface-above-ring',
+                    'stalk-surface-below-ring',
+                    'stalk-color-above-ring',
+                    'stalk-color-below-ring',
+                    'veil-type',
+                    'veil-color',
+                    'ring-number',
+                    'ring-type',
+                    'spore-print-color',
+                    'population',
+                    'habitat']
 
-def preprocessData(csvFilePath):
-    column_name_list = ["class", 'cap-shape',
-                        'cap-surface',
-                        'cap-color',
-                        'bruises?',
-                        'odor',
-                        'gill-attachment',
-                        'gill-spacing',
-                        'gill-size',
-                        'gill-color',
-                        'stalk-shape',
-                        'stalk-surface-above-ring',
-                        'stalk-surface-below-ring',
-                        'stalk-color-above-ring',
-                        'stalk-color-below-ring',
-                        'veil-type',
-                        'veil-color',
-                        'ring-number',
-                        'ring-type',
-                        'spore-print-color',
-                        'population',
-                        'habitat']
-    df = pd.read_csv(csvFilePath, names=column_name_list, dtype=str)
-    return df
 
-    
+def readCsv(csvFile):
+    return pd.read_csv(csvFile, names=column_name_list)
+
+
+def preprocessData(df):
+    converted_df = pd.get_dummies(df)
+    return converted_df
+
 
 if __name__ == '__main__':
-    df = preprocessData(r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv")
-    classlist = df['class'].values
-    print(classlist)
+    df = readCsv(r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv")
+    print(preprocessData(df))

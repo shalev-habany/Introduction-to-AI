@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 column_name_list = ["class", 'cap-shape',
                     'cap-surface',
@@ -29,8 +31,15 @@ def readCsv(csvFile):
 
 
 def preprocessData(df):
-    converted_df = pd.get_dummies(df)
-    return converted_df
+    X = df.drop(['odor'], axis=1)
+    y = pd.DataFrame(df['odor'])
+    converted_X = pd.get_dummies(X)
+    converted_y = pd.get_dummies(y)
+    # converted_y.hist()
+    # plt.show()
+    X_train, X_test, y_train, y_test = train_test_split(
+        converted_X, converted_y, train_size=0.66, test_size=0.33, random_state=42)
+    return [X_train, X_test, y_train, y_test]
 
 
 if __name__ == '__main__':

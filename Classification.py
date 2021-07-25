@@ -5,10 +5,7 @@ from sklearn.svm import SVC
 import preprocess
 import tensorflow as tf
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-from tensorflow.keras.losses import CategoricalCrossentropy
-import seaborn as sn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 

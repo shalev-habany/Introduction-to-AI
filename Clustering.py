@@ -1,31 +1,42 @@
 import preprocess
+import DimationReduction
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
 import plotly.express as px
-import DimationReduction
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import silhouette_samples, silhouette_score
 
 dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
+reducedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\reduced_data.csv"
 
 
 class Clustering:
 
-    def __init__(self, method, dataPath):
+    def __init__(self, method, dimensionReduction="no"):
         '''
 
         :param method:
         :param dataPath:
         '''
-        self.dataPath = dataPath
-        self.data = preprocess.readCsv(self.dataPath)
+        self.dimensionReduction = dimensionReduction
+        self.reducedData = pd.read_csv(reducedDataPath)
+        self.data = preprocess.readCsv(dataPath)
+        self.reducedEncodedData = preprocess.preprocessReducedData(self.reducedData, self.data)
         self.encodedData = preprocess.preprocessData(self.data)
-        self.X = self.encodedData[4]
-        self.y = self.encodedData[5]
+        self.X = None
+        self.y = None
         self.method = method
+
+    def set_data(self):
+        if self.dimensionReduction == "yes":
+            self.X = self.reducedEncodedData[4]
+            self.y = self.reducedEncodedData[5]
+        if self.dimensionReduction == "no":
+            self.X = self.encodedData[4]
+            self.y = self.encodedData[5]
 
     def convert_cluster_to_letters(self, nparray):
         npList = list(nparray)
@@ -50,28 +61,36 @@ class Clustering:
                 npList[i] = "i"
         return npList
 
-    def gmm(self, data):
-        gmm_model = GaussianMixture(n_components=9)
-        predicted_y = gmm_model.fit_predict(data)
+    def gmm(self, n_clusters=9):
+        gmm_model = GaussianMixture(n_components=n_clusters)
+        predicted_y = gmm_model.fit_predict(self.X)
         yList = self.convert_cluster_to_letters(predicted_y)
         df = pd.DataFrame(yList, columns=['cluster'])
         return df, predicted_y
 
-    def K_means(self, data):
-        KMeans_model = KMeans(n_clusters=9)
-        predicted_y = KMeans_model.fit_predict(data)
-        yList = self.convert_cluster_to_letters(predicted_y)
-        df = pd.DataFrame(yList, columns=['cluster'])
-        return df, predicted_y
-        # print(df)
+    def K_means(self, n_clusters=9):
+        KMeans_model = KMeans(n_clusters=n_clusters)
+        predicted_y = KMeans_model.fit_predict(self.X)
+        # yList = self.convert_cluster_to_letters(predicted_y)
+        df = pd.DataFrame(predicted_y, columns=['cluster'])
+        # for i in range(1, 9, 1):
+        #     cluster_a = df.loc[df['cluster'] == i]
+        #     print(cluster_a)
+        #     cluster_a_with_labels = pd.concat([cluster_a, self.y], axis=1, join="inner")
+        #     print(cluster_a_with_labels)
+        #     df_for_histo = cluster_a_with_labels.drop(["cluster"], axis=1)
+        #     print(df_for_histo)
+        #     df_for_histo.hist()
+        #     plt.show()
         # dummyData = pd.get_dummies(df)
         # print(dummyData)
+        return df, predicted_y
         # dummyData.hist()
         # plt.show()
 
-    def Hierarchical_clustering(self, data):
-        hierarchical_model = AgglomerativeClustering(n_clusters=9)
-        predicted_y = hierarchical_model.fit_predict(data)
+    def Hierarchical_clustering(self, n_clusters=9):
+        hierarchical_model = AgglomerativeClustering(n_clusters=n_clusters)
+        predicted_y = hierarchical_model.fit_predict(self.X)
         # self.histogramPlotter(predicted_y)
         yList = self.convert_cluster_to_letters(predicted_y)
         df = pd.DataFrame(yList, columns=['cluster'])
@@ -89,7 +108,7 @@ class Clustering:
 
     def plotClustering(self):
         dr = DimationReduction.DimantionReduction()
-        dr.reduceDimentionForPlot()
+        dr.reduceDimensionForPlot()
         if self.method == "K_means":
             clusters = self.K_means(dr.reduced_X_for_plot)[0]
             print(clusters)
@@ -117,21 +136,24 @@ class Clustering:
 
     def calc_silhouette_score(self):
         if self.method == 'gmm':
-            silhouette_avg = silhouette_score(self.X, self.gmm(self.X)[1])
-            sample_silhouette_values = silhouette_samples(self.X, self.gmm(self.X)[1])
-            print(self.method + ' silhouette samples: ', sample_silhouette_values)
+            silhouette_avg = silhouette_score(self.X, self.gmm()[1])
+            # sample_silhouette_values = silhouette_samples(self.X, self.gmm(self.X)[1])
+            # print(self.method + ' silhouette samples: ', sample_silhouette_values)
             print(self.method + "silhouette score: ", silhouette_avg)
             return silhouette_avg
         if self.method == 'K_means':
-            silhouette_avg = silhouette_score(self.X, self.K_means(self.X)[1])
+            silhouette_avg = silhouette_score(self.X, self.K_means()[1])
             print(self.method + "silhouette score: ", silhouette_avg)
             return silhouette_avg
         if self.method == 'Hierarchical':
-            silhouette_avg = silhouette_score(self.X, self.Hierarchical_clustering(self.X)[1])
+            silhouette_avg = silhouette_score(self.X, self.Hierarchical_clustering()[1])
             print(self.method + "silhouette score: ", silhouette_avg)
             return silhouette_avg
 
+
 if __name__ == '__main__':
     dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
-    km = Clustering('gmm', dataPath)
+    km = Clustering('Hierarchical', dimensionReduction="yes")
+    km.set_data()
+    km.Hierarchical_clustering()
     km.calc_silhouette_score()

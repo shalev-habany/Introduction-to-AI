@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
+reducedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\reduced_data.csv"
 
 
 class DimantionReduction:
-    def __init__(self, n_components):
+    def __init__(self, n_components=28):
         self.data = preprocess.readCsv(dataPath)
         self.encodedData = preprocess.preprocessData(self.data)
         self.X_train = self.encodedData[0]
@@ -24,7 +25,7 @@ class DimantionReduction:
         self.reduced_X = None
         self.reduced_X_for_plot = None
 
-    def reduceDimantion(self):
+    def reduceDimension(self):
         # normalized_X = StandardScaler().fit_transform(self.X)
         pca = PCA(n_components=self.n_components)
         principalComponents = pca.fit_transform(self.X)
@@ -34,12 +35,14 @@ class DimantionReduction:
         principalDf = pd.DataFrame(data=principalComponents
                                    , columns=column_names)
         self.reduced_X = principalDf
+        print(self.reduced_X)
+        # self.reduced_X.to_csv(reducedDataPath)
         plt.plot(np.cumsum(pca.explained_variance_ratio_))
         plt.xlabel('number of features')
         plt.ylabel('explained variance')
         plt.show()
 
-    def reduceDimentionForPlot(self):
+    def reduceDimensionForPlot(self):
         # normalized_X = StandardScaler().fit_transform(self.X)
         pca = PCA(n_components=2)
         principalComponents = pca.fit_transform(self.X)
@@ -69,8 +72,9 @@ class DimantionReduction:
         # plt.show(block=True)
 
 
-
 if __name__ == '__main__':
+    # 28 saves 93% explained variance of the data
     dr = DimantionReduction(101)
-    dr.ICA_reduceDimentionForPlot()
-    dr.plotReducedData()
+    # dr.ICA_reduceDimentionForPlot()
+    # dr.plotReducedData()
+    dr.reduceDimension()

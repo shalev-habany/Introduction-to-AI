@@ -1,6 +1,4 @@
 import statistics
-
-import sklearn.metrics
 from sklearn.svm import SVC
 import preprocess
 import tensorflow as tf
@@ -10,29 +8,53 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
+reducedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\reduced_data.csv"
+deletedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data_missing.csv"
 
 
 class Classification:
-    def __init__(self, method, kernal, num_of_trees):
+    def __init__(self, kernal="linear", num_of_trees=10, dimensionreduction="no", deletedDataRead="no"):
+        self.deletedDataRead = deletedDataRead
+        self.dimensionreduction = dimensionreduction
+        self.deletedData = preprocess.readCsv(deletedDataPath)
+        self.reducedData = pd.read_csv(reducedDataPath)
         self.data = preprocess.readCsv(dataPath)
         self.encodedData = preprocess.preprocessData(self.data)
-        self.X_train = self.encodedData[0]
-        self.X_test = self.encodedData[1]
-        self.y_train = self.encodedData[2]
-        self.y_test = self.encodedData[3]
-        self.method = method
+        self.reducedEncodedData = preprocess.preprocessReducedData(self.reducedData, self.data)
+        self.deletedEncodedData = preprocess.preprocessDeletedData(self.deletedData)
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
         self.labels = preprocess.column_name_list
         self.kernal = kernal
         self.num_of_trees = num_of_trees
+
+    def set_data(self):
+        if self.dimensionreduction == "yes":
+            self.X_train = self.reducedEncodedData[0]
+            self.X_test = self.reducedEncodedData[1]
+            self.y_train = self.reducedEncodedData[2]
+            self.y_test = self.reducedEncodedData[3]
+        if self.deletedDataRead == "yes":
+            self.X_train = self.deletedEncodedData[0]
+            self.X_test = self.deletedEncodedData[1]
+            self.y_train = self.deletedEncodedData[2]
+            self.y_test = self.deletedEncodedData[3]
+        else:
+            self.X_train = self.encodedData[0]
+            self.X_test = self.encodedData[1]
+            self.y_train = self.encodedData[2]
+            self.y_test = self.encodedData[3]
 
     def randomForest(self):
         accuracyList = []
         for feature in self.y_train.columns.values:
             rf_model = RandomForestClassifier(n_estimators=self.num_of_trees)
             rf_model.fit(self.X_train, self.y_train[feature])
-            print(feature + " accuracy score: ", accuracy_score(self.y_test[feature], rf_model.predict(self.X_test)))
+            # print(feature + " accuracy score: ", accuracy_score(self.y_test[feature], rf_model.predict(self.X_test)))
             accuracyList.append(accuracy_score(self.y_test[feature], rf_model.predict(self.X_test)))
-            print("prediction", rf_model.predict(self.X_test))
+            # print("prediction", rf_model.predict(self.X_test))
         print("average accuracy: ", statistics.mean(accuracyList))
         return statistics.mean(accuracyList)
         #     plotList.append([i, accuracy_score(self.y_test, rf_model.predict(self.X_test))])
@@ -56,8 +78,12 @@ class Classification:
         accuracyList = []
         print("all set")
         nnModel = tf.keras.models.Sequential()
-        nnModel.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
-        nnModel.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
+        if self.deletedDataRead == "yes":
+            nnModel.add(tf.keras.layers.Dense(32, input_shape=(self.X_train.shape[1],), activation=tf.nn.relu))
+            nnModel.add(tf.keras.layers.Dense(64, activation=tf.nn.relu))
+        if self.deletedDataRead == "no":
+            nnModel.add(tf.keras.layers.Dense(128, input_shape=(self.X_train.shape[1],), activation=tf.nn.relu))
+            nnModel.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
         nnModel.add(tf.keras.layers.Dense(1, activation=tf.nn.sigmoid))
         nnModel.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         dct = {}
@@ -74,26 +100,8 @@ class Classification:
 
 
 if __name__ == '__main__':
-    nn = Classification("s", 'rbf', 10)
-    # nn.nnTrain()
-    # plotList = []
-    # for i in range(1, 20):
-    #     nn = Classification("s", 'linear', 20)
-    #     plotList.append([i, nn.randomForest()])
-    # plt.plot([item[0] for item in plotList], [item[1] for item in plotList])
-    # plt.title('accuracy score')
-    # plt.ylabel('accuracy')
-    # plt.xlabel('number of trees')
-    # plt.legend("accuracy_score")
-    # plt.show()
-    nn.nnTrain()
-    # nn.randomForest()
-    # relu_history = nn.nnTrain()
-    # print(relu_history.history.keys())
-    # plt.figure(figsize=(10, 5))
-    # plt.plot(relu_history.history['categorical_crossentropy'], label='relu')
-    # plt.title('categorical_crossentropy')
-    # plt.ylabel('categorical_crossentropy')
-    # plt.xlabel('epoch')
-    # plt.legend()
-    # plt.show()
+    for i in range(1, 20, 1):
+        print("num of trees: ", i)
+        nn = Classification('linear', i, deletedDataRead="yes")
+        nn.set_data()
+        nn.randomForest()

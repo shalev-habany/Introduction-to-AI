@@ -166,7 +166,7 @@ class Clustering:
             return silhouette_avg
 
 
-if __name__ == '__main__':
-    km = Clustering('gmm')
-    km.set_data()
-    km.plotClustering()
+# if __name__ == '__main__':
+#     km = Clustering('gmm')
+#     km.set_data()
+#     km.plotClustering()

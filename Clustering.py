@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
 import plotly.express as px
 from sklearn.mixture import GaussianMixture
-from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.metrics import silhouette_samples, silhouette_score, fowlkes_mallows_score
 
 dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
 reducedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\reduced_data.csv"
@@ -110,7 +110,8 @@ class Clustering:
         dr = DimationReduction.DimantionReduction()
         dr.reduceDimensionForPlot()
         if self.method == "K_means":
-            clusters = self.K_means(dr.reduced_X_for_plot)[0]
+            self.X = dr.reduced_X_for_plot
+            clusters = self.K_means()[0]
             print(clusters)
             new_df = pd.concat([dr.reduced_X_for_plot, clusters[['cluster']]], axis=1)
             print(new_df)
@@ -118,7 +119,8 @@ class Clustering:
             fig.write_html('k.html')
             fig.show()
         if self.method == "Hierarchical":
-            clusters = self.Hierarchical_clustering(dr.reduced_X_for_plot)[0]
+            self.X = dr.reduced_X_for_plot
+            clusters = self.Hierarchical_clustering()[0]
             print(clusters)
             new_df = pd.concat([dr.reduced_X_for_plot, clusters[['cluster']]], axis=1)
             print(new_df)
@@ -139,21 +141,31 @@ class Clustering:
             silhouette_avg = silhouette_score(self.X, self.gmm()[1])
             # sample_silhouette_values = silhouette_samples(self.X, self.gmm(self.X)[1])
             # print(self.method + ' silhouette samples: ', sample_silhouette_values)
-            print(self.method + "silhouette score: ", silhouette_avg)
+            print(self.method + " silhouette score: ", silhouette_avg)
+            a = np.array(self.y)
+            labelEncoded_y = np.where(a == 1)[1]
+            fowlkes_mallows_avg = fowlkes_mallows_score(labelEncoded_y, self.gmm()[1])
+            print(self.method + " fowlkes mallows score: ", fowlkes_mallows_avg)
             return silhouette_avg
         if self.method == 'K_means':
             silhouette_avg = silhouette_score(self.X, self.K_means()[1])
             print(self.method + "silhouette score: ", silhouette_avg)
-            return silhouette_avg
+            a = np.array(self.y)
+            labelEncoded_y = np.where(a == 1)[1]
+            fowlkes_mallows_avg = fowlkes_mallows_score(labelEncoded_y, self.K_means()[1])
+            print(self.method + " fowlkes mallows score: ", fowlkes_mallows_avg)
+            return silhouette_avg, fowlkes_mallows_avg
         if self.method == 'Hierarchical':
             silhouette_avg = silhouette_score(self.X, self.Hierarchical_clustering()[1])
             print(self.method + "silhouette score: ", silhouette_avg)
+            a = np.array(self.y)
+            labelEncoded_y = np.where(a == 1)[1]
+            fowlkes_mallows_avg = fowlkes_mallows_score(labelEncoded_y, self.Hierarchical_clustering()[1])
+            print(self.method + " fowlkes mallows score: ", fowlkes_mallows_avg)
             return silhouette_avg
 
 
-if __name__ == '__main__':
-    dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
-    km = Clustering('Hierarchical', dimensionReduction="yes")
-    km.set_data()
-    km.Hierarchical_clustering()
-    km.calc_silhouette_score()
+# if __name__ == '__main__':
+#     km = Clustering('gmm', dimensionReduction="yes")
+#     km.set_data()
+#     km.calc_silhouette_score()

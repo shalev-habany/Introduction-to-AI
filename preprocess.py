@@ -79,17 +79,17 @@ def preprocessDeletedData(df):
         if "-" in column:
             converted_X = converted_X.drop([column], axis=1)
     converted_y = converted_y.drop(['odor_-'], axis=1)
-    print(converted_X.shape)
-    print(converted_y.shape)
     X_train, X_test, y_train, y_test = train_test_split(
         converted_X, converted_y, train_size=0.66, test_size=0.33, random_state=42)
     return [X_train, X_test, y_train, y_test, converted_X, converted_y]
 
 
 
-if __name__ == '__main__':
-    df = readCsv(r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv")
-    # preprocessDeletedData(df)
-    data = preprocessData(df)[0]
-    # print(data.shape[1])
-    preprocessWithAD(data)
+# if __name__ == '__main__':
+#     df = readCsv(r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data_missing.csv")
+#     preprocessDeletedData(df)
+#     # data = preprocessData(df)[5]
+#     # print(data.shape)
+#
+#     # print(data.shape[1])
+#     # preprocessWithAD(data)

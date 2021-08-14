@@ -72,9 +72,9 @@ class DimantionReduction:
         # plt.show(block=True)
 
 
-if __name__ == '__main__':
-    # 28 saves 93% explained variance of the data
-    dr = DimantionReduction(101)
-    # dr.ICA_reduceDimentionForPlot()
-    # dr.plotReducedData()
-    dr.reduceDimension()
+# if __name__ == '__main__':
+#     # 28 saves 93% explained variance of the data
+#     dr = DimantionReduction(101)
+#     # dr.ICA_reduceDimentionForPlot()
+#     # dr.plotReducedData()
+#     dr.reduceDimension()

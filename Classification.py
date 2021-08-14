@@ -36,7 +36,7 @@ class Classification:
             self.X_test = self.reducedEncodedData[1]
             self.y_train = self.reducedEncodedData[2]
             self.y_test = self.reducedEncodedData[3]
-        if self.deletedDataRead == "yes":
+        elif self.deletedDataRead == "yes":
             self.X_train = self.deletedEncodedData[0]
             self.X_test = self.deletedEncodedData[1]
             self.y_train = self.deletedEncodedData[2]
@@ -99,9 +99,9 @@ class Classification:
         # Keras.to_csv("results.csv")
 
 
-if __name__ == '__main__':
-    for i in range(1, 20, 1):
-        print("num of trees: ", i)
-        nn = Classification('linear', i, deletedDataRead="yes")
-        nn.set_data()
-        nn.randomForest()
+# if __name__ == '__main__':
+#     for i in range(1, 20, 1):
+#         print("num of trees: ", i)
+#         nn = Classification('linear', i, deletedDataRead="yes")
+#         nn.set_data()
+#         nn.randomForest()

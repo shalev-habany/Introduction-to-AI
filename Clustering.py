@@ -128,7 +128,8 @@ class Clustering:
             fig.write_html('h.html')
             fig.show()
         if self.method == 'gmm':
-            clusters = self.gmm(dr.reduced_X_for_plot)[0]
+            self.X = dr.reduced_X_for_plot
+            clusters = self.gmm()[0]
             print(clusters)
             new_df = pd.concat([dr.reduced_X_for_plot, clusters[['cluster']]], axis=1)
             print(new_df)
@@ -165,7 +166,7 @@ class Clustering:
             return silhouette_avg
 
 
-# if __name__ == '__main__':
-#     km = Clustering('gmm', dimensionReduction="yes")
-#     km.set_data()
-#     km.calc_silhouette_score()
+if __name__ == '__main__':
+    km = Clustering('gmm')
+    km.set_data()
+    km.plotClustering()

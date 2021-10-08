@@ -7,9 +7,9 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-dataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data.csv"
-reducedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\reduced_data.csv"
-deletedDataPath = r"C:\Users\shalev\Desktop\Introduction_to_AI\Introduction-to-AI\Data\mushrooms_data_missing.csv"
+dataPath = r"C:\Users\shale\Desktop\Introduction-to-AI\Data\mushrooms_data.csv"
+reducedDataPath = r"C:\Users\shale\Desktop\Introduction-to-AI\Data\reduced_data.csv"
+deletedDataPath = r"C:\Users\shale\Desktop\Introduction-to-AI\Data\mushrooms_data_missing.csv"
 
 
 class Classification:
